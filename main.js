@@ -208,7 +208,7 @@ function setupThreeJS() {
     // Create beautiful gradient background
     const gradientTexture = createGradientTexture();
     scene.background = gradientTexture;
-    scene.fog = new THREE.FogExp2(0x667eea, 0.0005);
+    scene.fog = new THREE.FogExp2(0x000000, 0.002); // Darker fog for deep space feel
 
     // Camera
     camera = new THREE.PerspectiveCamera(
@@ -396,12 +396,11 @@ function createGradientTexture() {
     canvas.height = 256;
     const context = canvas.getContext('2d');
 
-    // Beautiful romantic gradient - purple to pink to gold
-    const gradient = context.createLinearGradient(0, 0, 0, 256);
-    gradient.addColorStop(0, '#667eea'); // Purple
-    gradient.addColorStop(0.3, '#764ba2'); // Deep purple
-    gradient.addColorStop(0.6, '#f093fb'); // Pink
-    gradient.addColorStop(1, '#f5576c'); // Rose
+    // Wonderful black sky gradient - Midnight Blue to Black
+    const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+    gradient.addColorStop(0, '#1a1a2e'); // Deep Midnight
+    gradient.addColorStop(0.5, '#0f0f1b'); // Darker Blue
+    gradient.addColorStop(1, '#000000'); // Absolute Black
 
     context.fillStyle = gradient;
     context.fillRect(0, 0, 256, 256);
@@ -465,7 +464,7 @@ function createHeartParticles() {
 let starField = null;
 
 function createStarField() {
-    const starCount = 200;
+    const starCount = 1000; // Increased for a more "wonderful" look
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -490,11 +489,12 @@ function createStarField() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-        size: 2,
+        size: 1.5,
         vertexColors: true,
         transparent: true,
-        opacity: 0.8,
-        blending: THREE.AdditiveBlending
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
     });
 
     starField = new THREE.Points(geometry, material);
@@ -1275,6 +1275,79 @@ function setupEventListeners() {
             handleScroll();
         }, 5);
     }, { passive: true });
+
+    // Interactive Chat Box Logic (With Dragging)
+    const chatBox = document.getElementById('image-text-overlay');
+    if (chatBox) {
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+
+        chatBox.style.pointerEvents = 'auto';
+
+        const onStart = (e) => {
+            isDragging = true;
+            chatBox.style.animationPlayState = 'paused'; // Pause jelly dance while dragging
+
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+            startX = clientX;
+            startY = clientY;
+
+            const rect = chatBox.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+
+            chatBox.style.right = 'auto';
+            chatBox.style.bottom = 'auto';
+            chatBox.style.left = initialX + 'px';
+            chatBox.style.top = initialY + 'px';
+        };
+
+        const onMove = (e) => {
+            if (!isDragging) return;
+
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            chatBox.style.left = initialX + dx + 'px';
+            chatBox.style.top = initialY + dy + 'px';
+        };
+
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            chatBox.style.animationPlayState = 'running';
+        };
+
+        chatBox.addEventListener('mousedown', onStart);
+        chatBox.addEventListener('touchstart', onStart, { passive: false });
+
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove, { passive: false });
+
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
+
+        chatBox.addEventListener('click', (e) => {
+            // Only trigger click effects if we weren't just dragging
+            if (Math.abs(startX - (e.clientX || startX)) < 5) {
+                chatBox.classList.remove('jiggle');
+                void chatBox.offsetWidth;
+                chatBox.classList.add('jiggle');
+
+                const popSound = document.getElementById('pop-sound');
+                if (popSound) {
+                    popSound.currentTime = 0;
+                    popSound.volume = 0.3;
+                    popSound.play().catch(() => { });
+                }
+            }
+        });
+    }
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
