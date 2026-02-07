@@ -297,6 +297,21 @@ function setupThreeJS() {
 
     // Start animation loop
     animate();
+
+    // Responsive FOV adjustment
+    updateCameraFOV();
+}
+
+function updateCameraFOV() {
+    if (!camera) return;
+    const aspect = window.innerWidth / window.innerHeight;
+    // Increase FOV for portrait mode to keep things visible
+    if (aspect < 1) {
+        camera.fov = 75; // Wider field of view for mobile
+    } else {
+        camera.fov = 60; // Standard for desktop
+    }
+    camera.updateProjectionMatrix();
 }
 
 // ============================================
@@ -842,10 +857,24 @@ function setupInteractions() {
     const mouse = new THREE.Vector2();
 
     // Mouse move for hover effects
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    const updateMouse = (clientX, clientY) => {
+        mouse.x = (clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+    };
 
+    window.addEventListener('mousemove', (event) => {
+        updateMouse(event.clientX, event.clientY);
+        handleInteractions();
+    });
+
+    window.addEventListener('touchstart', (event) => {
+        if (event.touches.length > 0) {
+            updateMouse(event.touches[0].clientX, event.touches[0].clientY);
+            handleInteractions();
+        }
+    }, { passive: true });
+
+    function handleInteractions() {
         raycaster.setFromCamera(mouse, camera);
 
         // Check balloon hover
@@ -854,8 +883,10 @@ function setupInteractions() {
             if (balloonMesh) {
                 const intersects = raycaster.intersectObject(balloonMesh);
                 if (intersects.length > 0) {
-                    document.body.style.cursor = 'pointer';
-                    balloonGroup.userData.isHovered = true;
+                    if (!balloonGroup.userData.isHovered) {
+                        document.body.style.cursor = 'pointer';
+                        balloonGroup.userData.isHovered = true;
+                    }
                 } else {
                     balloonGroup.userData.isHovered = false;
                 }
@@ -868,14 +899,23 @@ function setupInteractions() {
             if (mesh && mesh.userData.isVisible) {
                 const intersects = raycaster.intersectObject(mesh);
                 if (intersects.length > 0) {
-                    document.body.style.cursor = 'pointer';
-                    mesh.userData.isHovered = true;
+                    if (!mesh.userData.isHovered) {
+                        document.body.style.cursor = 'pointer';
+                        mesh.userData.isHovered = true;
+                    }
                 } else {
                     mesh.userData.isHovered = false;
                 }
             }
         });
-    });
+
+        // Reset cursor if nothing hovered
+        const anyHovered = balloons.some(b => b.userData.isHovered) ||
+            memoryImages.some(i => i && i.mesh && i.mesh.userData.isHovered);
+        if (!anyHovered) {
+            document.body.style.cursor = 'default';
+        }
+    }
 
     // Click handler for surprises
     window.addEventListener('click', (event) => {
@@ -1430,9 +1470,14 @@ function handleScroll() {
                 mesh.visible = true;
                 mesh.material.opacity = 1.0;
             } else {
-                // Growth animation - Start small (0.1) and grow to readable size (1.8)
+                // Growth animation - Adaptive scaling
                 const minScale = 0.1;
-                const maxScale = 1.8; // Optimized for full-screen readability without being huge
+                const aspect = window.innerWidth / window.innerHeight;
+                // Desktop gets larger bloom, mobile gets enough scale to show content clearly
+                const maxScale = aspect < 1 ? 0.9 : 1.8;
+
+                // On mobile, also push it slightly further back to see more of it
+                const zPos = aspect < 1 ? -6 : -4;
 
                 // Use easing function for smooth growth
                 const easedProgress = imageProgress < 0.5
@@ -1442,7 +1487,7 @@ function handleScroll() {
                 const scale = minScale + (maxScale - minScale) * easedProgress;
 
                 mesh.scale.set(scale, scale, scale);
-                mesh.position.set(0, 0, -4);
+                mesh.position.set(0, 0, zPos);
 
                 const origRotY = mesh.userData?.originalRotation?.y || 0;
                 const origRotX = mesh.userData?.originalRotation?.x || 0;

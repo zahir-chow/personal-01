@@ -421,6 +421,16 @@ body {
     transform: scale(0.95);
 }
 
+@media (max-width: 480px) {
+    .enable-audio-btn {
+        top: 10px;
+        right: 10px;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
 /* Image Text Overlay - Modern Chat Box Style */
 .image-text-overlay {
     position: fixed;
@@ -443,7 +453,24 @@ body {
     cursor: grab;
     user-select: none;
     touch-action: none;
-    /* Prevent scrolling while dragging box */
+}
+
+@media (max-width: 768px) {
+    .image-text-overlay {
+        right: 5%;
+        left: auto !important;
+        /* Ensure media query wins over JS drag positioning if needed */
+        max-width: 90%;
+        min-width: auto;
+        width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-text-overlay {
+        right: 2.5%;
+        width: 280px;
+    }
 }
 
 .image-text-overlay:active {
@@ -560,16 +587,30 @@ body {
 
 @media (max-width: 768px) {
     .image-text-overlay {
-        padding: 20px 25px;
         bottom: 5%;
     }
 
     .image-text-main {
-        font-size: 1.8rem;
+        font-size: 1.3rem;
+        padding: 15px 20px;
     }
 
     .image-text-sub {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        padding: 10px 18px;
+        margin-left: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-text-main {
+        font-size: 1.1rem;
+        padding: 12px 16px;
+    }
+
+    .image-text-sub {
+        font-size: 0.8rem;
+        padding: 8px 14px;
     }
 }
 
@@ -581,23 +622,30 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .countdown-number {
-        font-size: 10rem;
-    }
-
-    .countdown-number.go {
         font-size: 8rem;
     }
 
+    .countdown-number.go {
+        font-size: 6rem;
+    }
+
     .memory-title h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
     .wish-title {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
 
     .wish-message {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        line-height: 1.5;
+        padding: 0 10px;
+    }
+
+    .final-wish {
+        padding: 20px;
+        width: 95%;
     }
 }
 
