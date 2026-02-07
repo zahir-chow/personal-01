@@ -88,10 +88,32 @@ const MEMORY_IMAGES = [
 
 // Initialize the experience
 function init() {
+    console.log('Initializing experience...');
     setupAudioContext();
     setupThreeJS();
     setupEventListeners();
+    setScrollHeight(); // Set initial scroll height
     startCountdown();
+}
+
+// Function to set the document height for scrolling
+function setScrollHeight() {
+    const scrollHeightPerImage = 300;
+    const totalHeightUnits = CONFIG.memoryCount * scrollHeightPerImage + 400;
+
+    // We'll use pixels for more reliable cross-browser scrolling
+    const totalPixels = (totalHeightUnits * window.innerHeight) / 100;
+
+    // Apply to body
+    document.body.style.height = `${totalPixels}px`;
+
+    // Also apply to spacer div if it exists
+    const spacer = document.getElementById('scroll-spacer');
+    if (spacer) {
+        spacer.style.height = `${totalPixels}px`;
+    }
+
+    console.log(`Scroll height set to ${totalPixels}px (${totalHeightUnits}vh)`);
 }
 
 // ============================================
@@ -117,10 +139,16 @@ function setupAudioContext() {
             });
         }
 
-        // Try to play background music
+        // Try to play background music if journey already started
         const bgMusic = document.getElementById('background-music');
-        if (bgMusic && isJourneyStarted) {
-            playSound(bgMusic);
+        if (bgMusic) {
+            bgMusic.play().catch(e => console.log("Bg music interaction play failed:", e));
+        }
+
+        // Also try countdown sound if it was meant to be playing
+        const countSound = document.getElementById('countdown-sound');
+        if (countSound) {
+            countSound.play().catch(e => console.log("Countdown sound interaction play failed:", e));
         }
     };
 
@@ -1184,6 +1212,7 @@ function createGoBurst(element) {
 
 function startJourney() {
     isJourneyStarted = true;
+    setScrollHeight(); // Re-ensure height is set on journey start
     console.log('Journey started, memoryImages count:', memoryImages.length);
 
     // Don't show memory title - removed as requested
@@ -1618,8 +1647,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM ready');
 });
 
-// Create scrollable content - each image gets more space
-// Create scrollable content - each image gets LOTS of space for slow, smooth viewing
-// More space = slower scroll = more time per image (minimum 5 seconds)
-const scrollHeightPerImage = 300; // Much more space per image for slow, smooth viewing
-document.body.style.height = `${CONFIG.memoryCount * scrollHeightPerImage + 400}vh`;
+// Initial call to set height
+// Removed top-level height setting to preven blocking
+// init() handles this now
