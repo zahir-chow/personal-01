@@ -1222,7 +1222,7 @@ function startJourney() {
     }
 
     // Show first image immediately - start VERY small
-    if (memoryImages.length > 0 && memoryImages[0].mesh) {
+    if (memoryImages.length > 0 && memoryImages[0] && memoryImages[0].mesh) {
         const mesh = memoryImages[0].mesh;
         mesh.scale.set(0.1, 0.1, 0.1); // Start VERY small
         mesh.position.set(0, 0, -4);
@@ -1550,6 +1550,7 @@ function animate() {
 
     // Animate memory images with stable, gentle floating effect
     memoryImages.forEach((imageObj) => {
+        if (!imageObj || !imageObj.mesh) return;
         const mesh = imageObj.mesh;
         const glow = imageObj.glow;
 
