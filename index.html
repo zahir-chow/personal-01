@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Maluhu!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Countdown Overlay -->
+    <div id="countdown-overlay" class="countdown-overlay">
+        <div id="countdown-number" class="countdown-number">10</div>
+    </div>
+
+    <!-- Main Canvas Container -->
+    <div id="canvas-container" class="canvas-container"></div>
+
+    <!-- UI Elements -->
+    <div class="ui-layer">
+        <!-- Scroll Indicator -->
+        <div id="scroll-indicator" class="scroll-indicator">
+            <div class="scroll-text">Scroll to begin the journey</div>
+            <div class="scroll-arrow">↓</div>
+        </div>
+
+        <!-- Memory Title (Hidden - removed after countdown) -->
+        <div id="memory-title" class="memory-title hidden">
+            <h1 id="main-name">Happy Birthday!</h1>
+            <p class="subtitle">A journey through beautiful memories</p>
+        </div>
+
+        <!-- Image Text Overlay -->
+        <div id="image-text-overlay" class="image-text-overlay hidden">
+            <div class="image-text-main"></div>
+            <div class="image-text-sub"></div>
+        </div>
+
+        <!-- Final Birthday Wish -->
+        <div id="final-wish" class="final-wish hidden">
+            <h2 class="wish-title">🎂 Happy Birthday! 🎉</h2>
+            <p class="wish-message">May your special day be filled with joy, laughter, and all the love in the world.
+                Here's to another amazing year ahead!</p>
+            <div class="wish-signature">With all my love 💖</div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="countdown-sound" preload="auto">
+        <source src="sounds/andriig-happy-birthday-471211.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="background-music" loop preload="auto">
+        <source src="music/birthday-music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="pop-sound" preload="auto">
+        <source src="sounds/andriig-happy-birthday-471211.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Enable Button (for browsers that block autoplay) -->
+    <button id="enable-audio-btn" class="enable-audio-btn" style="display: none;">
+        🔊 Click to Enable Audio
+    </button>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
